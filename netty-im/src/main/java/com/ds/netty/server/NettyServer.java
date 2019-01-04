@@ -1,14 +1,10 @@
-package com.ds.netty;
+package com.ds.netty.server;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
@@ -17,29 +13,28 @@ import io.netty.util.concurrent.GenericFutureListener;
  * @since 2018/12/26
  */
 public class NettyServer {
+    private static final int PORT = 8000;
 
     public static void main(String[] args) throws InterruptedException {
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
 
         NioEventLoopGroup boss = new NioEventLoopGroup();
         NioEventLoopGroup worker = new NioEventLoopGroup();
+
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap
                 .group(boss, worker)
                 .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, 1024)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .childOption(ChannelOption.TCP_NODELAY, true)
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
                     protected void initChannel(NioSocketChannel ch) {
-                        ch.pipeline().addLast(new StringDecoder());
-                        ch.pipeline().addLast(new SimpleChannelInboundHandler<String>() {
-                            @Override
-                            protected void channelRead0(ChannelHandlerContext ctx, String msg) {
-                                System.out.println(msg);
-                            }
-                        });
+                        ch.pipeline().addLast(new ServerHandler());
                     }
                 });
 
-        bind(serverBootstrap, 8000);
+        bind(serverBootstrap, PORT);
 
     }
 

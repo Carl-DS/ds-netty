@@ -1,5 +1,7 @@
-package com.ds.netty.protocol.command;
+package com.ds.netty.protocol.request;
 
+import com.ds.netty.protocol.Packet;
+import com.ds.netty.protocol.command.Command;
 import lombok.Data;
 
 /**
@@ -9,7 +11,7 @@ import lombok.Data;
 @Data
 public class LoginRequestPacket extends Packet {
 
-    private Integer userId;
+    private String userId;
 
     private String username;
 
