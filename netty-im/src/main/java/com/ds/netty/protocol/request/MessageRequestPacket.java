@@ -14,6 +14,10 @@ public class MessageRequestPacket extends Packet {
 
     private String message;
 
+    public MessageRequestPacket(String message) {
+        this.message = message;
+    }
+
     /**
      * 指令
      * 所有的指令数据包都必须实现这个方法,这样我们就可以知道某种指令的含义

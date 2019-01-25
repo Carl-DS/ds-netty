@@ -1,5 +1,9 @@
 package com.ds.netty.server;
 
+import com.ds.netty.codec.PacketDecoder;
+import com.ds.netty.codec.PacketEncoder;
+import com.ds.netty.server.handler.LoginRequestHandler;
+import com.ds.netty.server.handler.MessageRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -30,24 +34,23 @@ public class NettyServer {
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
                     protected void initChannel(NioSocketChannel ch) {
-                        ch.pipeline().addLast(new ServerHandler());
+                        ch.pipeline().addLast(new PacketDecoder());
+                        ch.pipeline().addLast(new LoginRequestHandler());
+                        ch.pipeline().addLast(new MessageRequestHandler());
+                        ch.pipeline().addLast(new PacketEncoder());
                     }
                 });
 
         bind(serverBootstrap, PORT);
-
     }
 
     private static void bind(ServerBootstrap serverBootstrap, int port) {
-        serverBootstrap.bind(port).addListener(new GenericFutureListener<Future<? super Void>>() {
-            @Override
-            public void operationComplete(Future<? super Void> future) throws Exception {
-                if (future.isSuccess()) {
-                    System.out.println("端口[" + port + "]绑定成功!");
-                } else {
-                    System.err.println("端口[" + port + "]绑定失败!");
-                    bind(serverBootstrap, port + 1);
-                }
+        serverBootstrap.bind(port).addListener(future -> {
+            if (future.isSuccess()) {
+                System.out.println("端口[" + port + "]绑定成功!");
+            } else {
+                System.err.println("端口[" + port + "]绑定失败!");
+                bind(serverBootstrap, port + 1);
             }
         });
     }
