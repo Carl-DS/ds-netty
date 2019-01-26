@@ -1,9 +1,11 @@
 package com.ds.netty.client;
 
+import com.ds.netty.client.handler.FirstClientHandler;
 import com.ds.netty.client.handler.LoginResponseHandler;
 import com.ds.netty.client.handler.MessageResponseHandler;
 import com.ds.netty.codec.PacketDecoder;
 import com.ds.netty.codec.PacketEncoder;
+import com.ds.netty.codec.Spliter;
 import com.ds.netty.protocol.request.MessageRequestPacket;
 import com.ds.netty.util.LoginUtil;
 import io.netty.bootstrap.Bootstrap;
@@ -14,6 +16,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 import java.time.LocalDateTime;
 import java.util.Scanner;
@@ -40,6 +43,9 @@ public class NettyClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new FirstClientHandler());
+                        ch.pipeline().addLast(new Spliter());
+                        // ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 7, 4));
                         ch.pipeline().addLast(new PacketDecoder());
                         ch.pipeline().addLast(new LoginResponseHandler());
                         ch.pipeline().addLast(new MessageResponseHandler());

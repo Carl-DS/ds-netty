@@ -11,6 +11,8 @@ import io.netty.buffer.ByteBufAllocator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 /**
  * @author duosheng
  * @since 2019/1/4
@@ -20,17 +22,20 @@ public class PacketCodeCTest {
     @Test
     public void encode() {
         Serializer serializer = new JSONSerializer();
-
         LoginRequestPacket loginRequestPacket = new LoginRequestPacket();
-        loginRequestPacket.setUsername("carl");
-        loginRequestPacket.setPassword("carl1304");
-        loginRequestPacket.setUserId("1304");
-        loginRequestPacket.setVersion((byte)1);
 
+        loginRequestPacket.setVersion(((byte) 1));
+        loginRequestPacket.setUserId(UUID.randomUUID().toString());
+        loginRequestPacket.setUsername("zhangsan");
+        loginRequestPacket.setPassword("password");
 
-        ByteBuf encode = PacketCodeC.INSTANCE.encode(ByteBufAllocator.DEFAULT, loginRequestPacket);
-        Packet decode = PacketCodeC.INSTANCE.decode(encode);
-        Assertions.assertArrayEquals(serializer.serialize(loginRequestPacket), serializer.serialize(decode));
+        PacketCodeC packetCodeC = PacketCodeC.INSTANCE;
+        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
+
+        packetCodeC.encode(byteBuf, loginRequestPacket);
+        Packet decodedPacket = packetCodeC.decode(byteBuf);
+
+        Assertions.assertArrayEquals(serializer.serialize(loginRequestPacket), serializer.serialize(decodedPacket));
     }
 
     @Test
