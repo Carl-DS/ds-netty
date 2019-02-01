@@ -1,6 +1,5 @@
 package com.ds.netty.client;
 
-import com.ds.netty.client.handler.FirstClientHandler;
 import com.ds.netty.client.handler.LoginResponseHandler;
 import com.ds.netty.client.handler.MessageResponseHandler;
 import com.ds.netty.codec.PacketDecoder;
@@ -16,7 +15,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 import java.time.LocalDateTime;
 import java.util.Scanner;
@@ -43,7 +41,7 @@ public class NettyClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new FirstClientHandler());
+                        // ch.pipeline().addLast(new FirstClientHandler());
                         ch.pipeline().addLast(new Spliter());
                         // ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 7, 4));
                         ch.pipeline().addLast(new PacketDecoder());
@@ -79,13 +77,13 @@ public class NettyClient {
     private static void startConsoleThread(Channel channel) {
         new Thread(() -> {
             while (!Thread.interrupted()) {
-                if (LoginUtil.hasLogin(channel)) {
+                // if (LoginUtil.hasLogin(channel)) {
                     System.out.println("输入消息发送至服务端: ");
                     Scanner sc = new Scanner(System.in);
                     String line = sc.nextLine();
 
                     channel.writeAndFlush(new MessageRequestPacket(line));
-                }
+                // }
             }
         }).start();
     }
